@@ -1,0 +1,20 @@
+{
+  "name": "青ブタ 設定分析 Pro",
+  "short_name": "青ブタ分析",
+  "description": "L青春ブタ野郎はバニーガール先輩の夢を見ない 実戦用設定分析アプリ",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f4f9",
+  "theme_color": "#7459f5",
+  "orientation": "portrait-primary",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

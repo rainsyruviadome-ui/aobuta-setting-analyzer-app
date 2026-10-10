@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7459f5">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="青ブタ設定分析">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>青ブタ 設定分析 Pro</title>
+<style>
+:root{
+  --bg:#f5f4f9; --card:#ffffff; --ink:#24212b; --muted:#777180; --line:#e9e5ef;
+  --p:#7459f5; --p2:#ad8cff; --good:#15805d; --warn:#b96d0b; --bad:#bc4655;
+  --soft:#f1edff; --shadow:0 9px 28px rgba(50,42,75,.08); --r:19px;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{
+  margin:0;color:var(--ink);background:
+  radial-gradient(circle at 92% -5%,#e8e0ff 0,transparent 26%),
+  linear-gradient(180deg,#fbfafd 0,var(--bg) 33%);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif
+}
+button,input,select,textarea{font:inherit}
+button{touch-action:manipulation;cursor:pointer}
+.wrap{max-width:780px;margin:auto;padding:12px 12px 94px}
+.hero{padding:18px 8px 9px}
+.kicker{font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--p)}
+h1{font-size:26px;margin:5px 0 5px;line-height:1.2}
+.sub{font-size:12px;line-height:1.6;color:var(--muted)}
+.card{
+  background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.9);
+  border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin:12px 0
+}
+.card h2{font-size:17px;margin:0 0 12px}
+.card h3{font-size:14px;margin:15px 0 8px}
+.row{display:flex;gap:9px;align-items:center}
+.space{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.field{background:#faf9fc;border:1px solid var(--line);border-radius:14px;padding:10px 11px}
+.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+.field input,.field select,.field textarea{
+  width:100%;border:0;outline:none;background:transparent;color:var(--ink);font-weight:800
+}
+.field input[type=number]{font-size:22px}
+.field textarea{min-height:60px;resize:vertical;font-size:14px}
+.btn{
+  border:0;border-radius:13px;padding:11px 13px;font-weight:850;background:#efedf5;color:var(--ink)
+}
+.btn:active{transform:scale(.98)}
+.primary{background:var(--p);color:white}
+.secondary{background:#eeeafd;color:#5b44d1}
+.good{background:#e9f7f1;color:var(--good)}
+.danger{background:#fff0f2;color:var(--bad)}
+.small{font-size:12px;padding:8px 10px}
+.counter{
+  display:grid;grid-template-columns:50px 1fr 50px;gap:8px;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--line)
+}
+.counter:last-child{border-bottom:0}
+.counter .name{font-size:13px;font-weight:850}
+.counter .hint{font-size:10px;color:var(--muted);margin-top:2px}
+.counter .num{text-align:center;font-size:24px;font-weight:950}
+.pm{font-size:20px;padding:10px 0}
+.toggle{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);margin:8px 0 0}
+.toggle input{accent-color:var(--p);width:17px;height:17px}
+.resultHead{display:flex;align-items:end;justify-content:space-between;gap:10px}
+.big{font-size:32px;font-weight:950;letter-spacing:-.03em}
+.pill{border-radius:999px;padding:7px 10px;background:var(--soft);color:#5c47cf;font-size:11px;font-weight:900}
+.barrow{display:grid;grid-template-columns:48px 1fr 52px;gap:8px;align-items:center;margin:9px 0}
+.barlabel,.pct{font-size:12px;font-weight:900}
+.pct{text-align:right;font-variant-numeric:tabular-nums}
+.track{height:13px;background:#ece9f2;border-radius:999px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,var(--p),var(--p2));border-radius:999px;transition:width .25s}
+.info{font-size:11px;color:var(--muted);line-height:1.65}
+.info strong{color:var(--ink)}
+.notice{padding:11px;border-radius:14px;margin-top:10px;font-size:12px;font-weight:800}
+.notice.good{border:1px solid #cae9dc}
+.notice.warn{background:#fff7ea;color:#96600f;border:1px solid #f2dfbc}
+.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:2px;margin-bottom:10px}
+.tabs button{white-space:nowrap}
+.cuegrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cue{
+  border:1px solid var(--line);border-radius:14px;background:#fbfaff;padding:10px;text-align:left
+}
+.cue.on{border-color:var(--p);background:#f1edff;box-shadow:inset 0 0 0 1px var(--p)}
+.cue b{display:block;font-size:12px}
+.cue span{display:block;font-size:10px;color:var(--muted);margin-top:3px}
+.badgecount{
+  float:right;min-width:20px;text-align:center;border-radius:999px;background:#e9e5f4;
+  padding:2px 6px;font-size:10px
+}
+.cue.on .badgecount{background:var(--p);color:#fff}
+.cueActions{display:flex;gap:6px;margin-top:9px}
+.cueActions .btn{flex:1;padding:7px 8px;font-size:14px}
+.pointBtns{flex-wrap:wrap}
+.pointBtns .btn{flex:1 1 calc(50% - 5px)}
+.statbox{background:#faf9fc;border:1px solid var(--line);border-radius:14px;padding:11px}
+.statbox .label{font-size:10px;color:var(--muted)}
+.statbox .value{font-size:20px;font-weight:950;margin-top:2px}
+.compare{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+.hyenaGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.hyenaStatus{font-size:18px;font-weight:950;margin-top:3px}
+.hyenaLine{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}
+.hyenaLine:last-child{border-bottom:0}
+.hyenaLine b{text-align:right}
+.log{
+  max-height:270px;overflow:auto;border:1px solid var(--line);border-radius:14px
+}
+.logitem{
+  display:grid;grid-template-columns:58px 1fr auto;gap:8px;align-items:center;
+  padding:9px 10px;border-bottom:1px solid var(--line);font-size:11px
+}
+.logitem:last-child{border-bottom:0}
+.logitem .g{font-weight:900}
+.logitem .type{font-weight:800}
+.logitem .meta{color:var(--muted);font-size:10px}
+.x{border:0;background:transparent;color:var(--bad);font-weight:900;font-size:15px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th,td{padding:7px 5px;border-bottom:1px solid var(--line);text-align:right}
+th:first-child,td:first-child{text-align:left}
+canvas{display:block;width:100%;height:240px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sticky{
+  position:fixed;z-index:5;left:50%;bottom:8px;transform:translateX(-50%);
+  width:min(760px,calc(100% - 18px));display:flex;gap:8px;padding:8px;
+  background:rgba(245,244,249,.88);backdrop-filter:blur(12px);border-radius:16px;
+  border:1px solid rgba(255,255,255,.75)
+}
+.sticky .btn{flex:1;box-shadow:0 6px 18px rgba(48,40,76,.08)}
+details summary{font-size:13px;font-weight:850;cursor:pointer}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+a{color:#5c45d4}
+@media(max-width:450px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  .cuegrid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <div class="kicker">L 青春ブタ野郎はバニーガール先輩の夢を見ない</div>
+  <h1>青ブタ 設定分析 Pro</h1>
+  <div class="sub">実戦用・端末内保存・オフライン動作。公開済み数値のみを推定計算に使用します。</div>
+</header>
+
+<section class="card" id="pwaCard">
+  <div class="row space">
+    <div>
+      <div class="kicker">PWA</div>
+      <h2 style="margin:3px 0 4px">ホーム画面アプリ</h2>
+      <div class="info" id="pwaStatus">ブラウザで開いています。</div>
+    </div>
+    <button class="btn primary" id="installApp" style="display:none">ホーム画面に追加</button>
+  </div>
+  <div class="info" style="margin-top:8px">
+    インストール後はホーム画面から1タップで起動できます。主要機能はオフラインでも利用できます。
+  </div>
+</section>
+
+<section class="card">
+  <h2>現在の設定推定</h2>
+  <div class="resultHead">
+    <div>
+      <div class="info">モデル上の最有力</div>
+      <div class="big" id="best">設定 —</div>
+    </div>
+    <div class="pill" id="confidence">データ未入力</div>
+  </div>
+  <div id="bars" style="margin-top:12px"></div>
+  <div id="constraint" class="notice good" style="display:none"></div>
+  <div class="info" style="margin-top:10px">
+    数字は<strong>設定2〜6を同率の事前確率としたモデル内の相対値</strong>です。実際の設定がこの確率であることを保証する表示ではありません。
+  </div>
+</section>
+
+<section class="card">
+  <h2>実戦情報</h2>
+  <div class="grid2">
+    <div class="field"><label>通常ゲーム数</label><input id="games" type="number" inputmode="numeric" min="0" placeholder="0"></div>
+    <div class="field"><label>差枚</label><input id="netCoins" type="number" inputmode="numeric" placeholder="例：-650"></div>
+    <div class="field"><label>店名・台番号</label><input id="machineMemo" type="text" placeholder="例：123番台"></div>
+    <div class="field"><label>実戦メモ</label><input id="shortMemo" type="text" placeholder="例：朝イチから"></div>
+  </div>
+
+  <div class="notice warn" style="margin-top:10px">
+    <label style="display:flex;gap:9px;align-items:flex-start">
+      <input id="setting1Confirmed" type="checkbox" style="width:18px;height:18px;accent-color:var(--p);margin-top:1px">
+      <span><strong>設定1確認：</strong>デモ画面表示中に下パネル消灯を確認した</span>
+    </label>
+    <div class="info" style="margin-top:6px">設定1の各数値は公開解析で「－」のため、数値推定には混ぜず、この確認を優先表示します。</div>
+  </div>
+
+  <div class="counter">
+    <button class="btn pm" data-count="bonus" data-d="-1">−</button>
+    <div><div class="name">青春ボーナス 初当たり</div><div class="num" id="bonusV">0</div><div class="hint" id="bonusR">—</div></div>
+    <button class="btn primary pm" data-count="bonus" data-d="1" data-logtype="青春ボーナス">＋</button>
+  </div>
+  <div class="toggle"><input id="use_bonus" type="checkbox"><label for="use_bonus">設定推定に使う</label></div>
+
+  <div class="counter">
+    <button class="btn pm" data-count="aoharu" data-d="-1">−</button>
+    <div><div class="name">アオハルチャンス</div><div class="num" id="aoharuV">0</div><div class="hint" id="aoharuR">—</div></div>
+    <button class="btn primary pm" data-count="aoharu" data-d="1" data-logtype="アオハルチャンス">＋</button>
+  </div>
+  <div class="toggle"><input id="use_aoharu" type="checkbox"><label for="use_aoharu">設定推定に使う</label></div>
+
+  <div class="counter">
+    <button class="btn pm" data-count="dreamCollection" data-d="-1">−</button>
+    <div>
+      <div class="name">DREAM COLLECTION</div>
+      <div class="num" id="dreamCollectionV">0</div>
+      <div class="hint" id="dreamCollectionR">選択率 —</div>
+    </div>
+    <button class="btn secondary pm" data-count="dreamCollection" data-d="1">＋</button>
+  </div>
+  <div class="notice warn" style="margin-top:8px">
+    公開されている基本報酬割合はDREAM COLLECTION 32.1%で、全設定共通。
+    咲太ポイントMAX時はDREAM COLLECTION以上が選択されるため、この実測値は<strong>設定推定には使用しません</strong>。
+  </div>
+</section>
+
+<section class="card">
+  <h2>ハイエナ・天井状況</h2>
+  <div class="info">ここは<strong>設定推測とは別</strong>です。現在の天井・CZスルー状況を整理する補助機能で、期待値や勝率を断定するものではありません。</div>
+
+  <div class="grid2" style="margin-top:10px">
+    <div class="field"><label>ボーナス間ゲーム数（液晶右上）</label><input id="bonusGapG" type="number" inputmode="numeric" min="0" placeholder="0"></div>
+    <div class="field"><label>CZスルー回数（連続失敗）</label><input id="czMisses" type="number" inputmode="numeric" min="0" max="6" placeholder="0"></div>
+    <div class="field"><label>CZ間ゲーム数（液晶右上）</label><input id="czGapG" type="number" inputmode="numeric" min="0" placeholder="0"></div>
+    <div class="field"><label>現在の思春期ポイント</label><input id="currentPt" type="number" inputmode="numeric" min="0" max="1000" placeholder="0"></div>
+  </div>
+
+  <div class="toggle" style="margin-top:12px"><input id="afterStMiss" type="checkbox"><label for="afterStMiss"><strong>前回STが駆け抜け</strong>（ボーナス間天井699G＋α）</label></div>
+  <div class="toggle"><input id="afterReset" type="checkbox"><label for="afterReset"><strong>設定変更後（朝一リセット）</strong>（ボーナス間天井699G＋α）</label></div>
+
+  <div class="hyenaGrid" style="margin-top:12px">
+    <div class="statbox"><div class="label">ボーナス間天井</div><div class="hyenaStatus" id="bonusCeilingStatus">—</div><div class="compare" id="bonusCeilingSub">通常は最大899G＋α</div></div>
+    <div class="statbox"><div class="label">CZスルー天井</div><div class="hyenaStatus" id="czMissStatus">—</div><div class="compare" id="czMissSub">6連続失敗後、7回目CZ成功濃厚</div></div>
+  </div>
+
+  <div style="margin-top:12px">
+    <div class="hyenaLine"><span>CZ間ゲーム数天井</span><b id="czGameRemain">—</b></div>
+    <div class="hyenaLine"><span>思春期ポイント天井</span><b id="ptRemain">—</b></div>
+    <div class="hyenaLine"><span>条件の重なり</span><b id="hyenaSummary">—</b></div>
+  </div>
+
+  <div class="notice warn" style="margin-top:10px">
+    ボーナス間天井は通常最大899G＋α、ST駆け抜け時・設定変更時は699G＋α。CZは6回連続失敗後の7回目で青春ボーナス成功濃厚。CZ自体はCZ間560G＋αまたは思春期ポイント最大1000ptで当選します。
+  </div>
+</section>
+
+<section class="card">
+  <h2>小役実測・小役からの当選</h2>
+  <div class="info">
+    公開解析では通常時の小役成立確率は全設定共通です。ここでは<strong>自分の実戦値を確認するためだけ</strong>にカウントします。
+    設定判別で重要なのは、通常状態のチェリー・チャンス目からアオハルCHANCEへ当選した割合です。
+  </div>
+
+  <div id="rawRoleCounters" style="margin-top:8px"></div>
+
+  <h3>通常状態のみ：アオハルCHANCE当選率</h3>
+  <div class="grid2">
+    <div class="statbox">
+      <div class="label">チェリー → アオハル</div>
+      <div class="value" id="cherryAoharuTxt">0 / 0</div>
+      <div class="compare">設定2 30.1% / 3 30.9% / 4 36.3% / 5 37.5% / 6 40.2%</div>
+    </div>
+    <div class="statbox">
+      <div class="label">チャンス目 → アオハル</div>
+      <div class="value" id="chanceAoharuTxt">0 / 0</div>
+      <div class="compare">設定2 50.0% / 3 53.5% / 4 57.8% / 5 59.0% / 6 60.2%</div>
+    </div>
+  </div>
+
+  <h3>チェリー</h3>
+  <div class="row pointBtns">
+    <button class="btn" data-count="cherryNormal" data-d="-1">通常中 −</button>
+    <button class="btn secondary" data-count="cherryNormal" data-d="1">通常中 ＋</button>
+    <button class="btn" data-count="cherryAoharu" data-d="-1">当選 −</button>
+    <button class="btn good" data-count="cherryAoharu" data-d="1">当選 ＋</button>
+  </div>
+
+  <h3>チャンス目</h3>
+  <div class="row pointBtns">
+    <button class="btn" data-count="chanceNormal" data-d="-1">通常中 −</button>
+    <button class="btn secondary" data-count="chanceNormal" data-d="1">通常中 ＋</button>
+    <button class="btn" data-count="chanceAoharu" data-d="-1">当選 −</button>
+    <button class="btn good" data-count="chanceAoharu" data-d="1">当選 ＋</button>
+  </div>
+
+  <div class="toggle">
+    <input id="use_roleAoharu" type="checkbox">
+    <label for="use_roleAoharu">チェリー/チャンス目→アオハル当選率を設定推定に使う</label>
+  </div>
+  <div class="notice warn" style="margin-top:8px">
+    高確・リラックス中は全設定共通（スイカ30.1%・チェリー50.0%・チャンス目85.2%）なので、上の母数には<strong>通常状態と判断できる試行だけ</strong>を入れてください。
+    この項目をONにした場合、二重計上を避けるため「アオハルCHANCE全体出現率」は推定計算から自動的に外します。
+  </div>
+</section>
+
+<section class="card">
+  <h2>思春期ポイント</h2>
+  <div class="grid3">
+    <div class="statbox">
+      <div class="label">300pt 到達→CZ以上当選</div>
+      <div class="value" id="pt300Txt">0 / 0</div>
+      <div class="compare" id="pt300Cmp">設定2 約30% / 3 約34% / 4以上 40%以上</div>
+    </div>
+    <div class="statbox">
+      <div class="label">400pt 到達→前兆移行</div>
+      <div class="value" id="pt400Txt">0 / 0</div>
+      <div class="compare">設定2・3 1.0% / 4 1.2% / 5 1.3% / 6 2.8%</div>
+    </div>
+    <div class="statbox">
+      <div class="label">500pt 到達→CZ以上当選</div>
+      <div class="value" id="pt500Txt">0 / 0</div>
+      <div class="compare" id="pt500Cmp">設定2 約25% / 3 約27% / 4以上 33%以上</div>
+    </div>
+  </div>
+
+  <h3>300pt</h3>
+  <div class="row pointBtns">
+    <button class="btn" data-count="pt300pre" data-d="-1">到達 −</button>
+    <button class="btn secondary" data-count="pt300pre" data-d="1">到達 ＋</button>
+    <button class="btn" data-count="pt300hit" data-d="-1">CZ以上 −</button>
+    <button class="btn good" data-count="pt300hit" data-d="1">CZ以上 ＋</button>
+  </div>
+
+  <h3>400pt</h3>
+  <div class="row pointBtns">
+    <button class="btn" data-count="pt400trial" data-d="-1">到達 −</button>
+    <button class="btn secondary" data-count="pt400trial" data-d="1">到達 ＋</button>
+    <button class="btn" data-count="pt400hit" data-d="-1">前兆 −</button>
+    <button class="btn good" data-count="pt400hit" data-d="1">前兆 ＋</button>
+  </div>
+  <div class="toggle"><input id="use_pt400" type="checkbox"><label for="use_pt400">400pt移行率を設定推定に使う</label></div>
+
+  <h3>500pt</h3>
+  <div class="row pointBtns">
+    <button class="btn" data-count="pt500pre" data-d="-1">到達 −</button>
+    <button class="btn secondary" data-count="pt500pre" data-d="1">到達 ＋</button>
+    <button class="btn" data-count="pt500hit" data-d="-1">CZ以上 −</button>
+    <button class="btn good" data-count="pt500hit" data-d="1">CZ以上 ＋</button>
+  </div>
+
+  <div class="info" style="margin-top:10px">
+    300pt・500ptは高設定域が「以上」として公開されているため、<strong>実戦値の比較表示だけ</strong>に使い、設定別確率計算には入れていません。
+  </div>
+</section>
+
+<section class="card">
+  <h2>終了画面・示唆履歴</h2>
+  <div class="cuegrid" id="screenCues"></div>
+  <hr>
+  <h3>獲得枚数 / ハルルナPUSH</h3>
+  <div class="cuegrid" id="hardCues"></div>
+  <div class="notice good" id="hardCueNotice" style="display:none"></div>
+
+  <details style="margin-top:13px">
+    <summary>打-WIN LITE「隠れ凪」も記録する</summary>
+    <div class="notice warn">
+      現時点では解析ページでも「従来機種を参考」とされているため、このアプリでは設定確定・除外条件には使用しません。
+    </div>
+    <div class="cuegrid" id="nagiCues" style="margin-top:8px"></div>
+  </details>
+</section>
+
+<section class="card">
+  <h2>ステージチェンジ・アイキャッチ</h2>
+  <div class="cuegrid" id="eyecatchCues"></div>
+  <div class="notice warn">
+    <strong>青タイトル＋海中：</strong>現時点では正式な示唆内容が未判明です。設定推定には使用せず、実戦履歴としてのみ記録します。<br>
+    <strong>赤タイトル：</strong>100ptでCZにつながった実戦報告がありますが、メーカー公表の確定情報としては扱いません。
+  </div>
+</section>
+
+<section class="card">
+  <h2>追加の数値判別</h2>
+  <details open>
+    <summary>咲太クエスト / 咲太ポイントMAX</summary>
+    <div id="extraCounters" style="margin-top:8px"></div>
+    <div class="toggle"><input id="use_quest" type="checkbox"><label for="use_quest">咲太クエストを設定推定に使う</label></div>
+    <div class="toggle"><input id="use_saku" type="checkbox"><label for="use_saku">咲太ポイントMAXを設定推定に使う</label></div>
+  </details>
+</section>
+
+<section class="card">
+  <h2>イベント履歴</h2>
+  <div class="row" style="margin-bottom:10px">
+    <button class="btn secondary small" id="addNote">現在Gでメモ</button>
+    <button class="btn small" id="clearLog">履歴クリア</button>
+  </div>
+  <div id="eventLog" class="log"></div>
+  <div class="info" style="margin-top:8px">「＋」で青春ボーナス / アオハルチャンスを追加すると現在G数で自動記録します。「−」で戻した場合は対応する直近の自動履歴も1件取り消します。</div>
+</section>
+
+<section class="card">
+  <h2>推定推移</h2>
+  <canvas id="chart" width="720" height="240"></canvas>
+  <div class="row" style="margin-top:10px">
+    <button class="btn primary" id="snapshot">現在値を記録</button>
+    <button class="btn" id="clearSnapshots">グラフ履歴クリア</button>
+  </div>
+  <div class="info" style="margin-top:8px">実戦の節目で「現在値を記録」を押すと、設定2〜6の相対推定値を保存して推移を描画します。</div>
+</section>
+
+<section class="card">
+  <h2>データ管理</h2>
+  <div class="actions">
+    <button class="btn secondary" id="exportJson">バックアップ保存</button>
+    <button class="btn secondary" id="exportCsv">履歴CSV保存</button>
+    <button class="btn" id="importBtn">バックアップ読込</button>
+    <button class="btn danger" id="resetAll">すべてリセット</button>
+  </div>
+  <input id="importFile" type="file" accept="application/json,.json" hidden>
+  <div class="info" style="margin-top:9px">通常はブラウザ内へ自動保存されます。機種変更や別ブラウザへ移す場合はバックアップ保存を利用してください。</div>
+</section>
+
+<section class="card">
+  <h2>使用している公開解析値</h2>
+  <table>
+    <thead><tr><th>設定</th><th>初当たり</th><th>アオハル</th><th>400pt</th><th>咲太MAX</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>－</td><td>－</td><td>－</td><td>－</td></tr>
+      <tr><td>2</td><td>1/350.8</td><td>1/63.7</td><td>1.0%</td><td>1/12387.9</td></tr>
+      <tr><td>3</td><td>1/336.5</td><td>1/62.4</td><td>1.0%</td><td>1/12163.0</td></tr>
+      <tr><td>4</td><td>1/295.1</td><td>1/59.4</td><td>1.2%</td><td>1/12210.3</td></tr>
+      <tr><td>5</td><td>1/274.6</td><td>1/58.6</td><td>1.3%</td><td>1/11518.1</td></tr>
+      <tr><td>6</td><td>1/207.8</td><td>1/57.2</td><td>2.8%</td><td>1/8348.9</td></tr>
+    </tbody>
+  </table>
+  <h3>通常時の小役成立確率（全設定共通）</h3>
+  <table>
+    <tbody>
+      <tr><td>リプレイ</td><td>1/9.5</td><td>ベル</td><td>1/5.6</td></tr>
+      <tr><td>チェリー</td><td>1/66.9</td><td>スイカ</td><td>1/99.4</td></tr>
+      <tr><td>チャンス目合算</td><td>1/199.2</td><td>レア小役合算※観測目含む</td><td>1/31.5</td></tr>
+    </tbody>
+  </table>
+  <div class="info" style="margin-top:9px">
+    設定1は各解析数値が「－」で、デモ画面表示中の下パネル消灯により判別可能とされています。数値モデルは設定2〜6のみを比較します。<br>
+    天井条件は2026-09-29更新の解析も参照。<br>DREAM COLLECTION基本報酬割合は全設定共通32.1%（咲太ポイントMAX以外）。<br>
+    最終確認：2026-10-10。出典：
+    <a href="https://nana-press.com/kaiseki/machine/1214/38855/" target="_blank" rel="noopener">ななプレス</a> /
+    <a href="https://1geki.jp/slot/l_ao_buta/0/" target="_blank" rel="noopener">一撃</a>
+  </div>
+</section>
+
+<div class="sticky">
+  <button class="btn primary" id="saveState">自動保存中</button>
+  <button class="btn secondary" id="snapshotBottom">推定を記録</button>
+</div>
+</div>
+
+<script>
+const SETTINGS=[2,3,4,5,6];
+const RATE={
+  bonus:{2:350.8,3:336.5,4:295.1,5:274.6,6:207.8},
+  aoharu:{2:63.7,3:62.4,4:59.4,5:58.6,6:57.2},
+  pt400:{2:.010,3:.010,4:.012,5:.013,6:.028},
+  saku:{2:12387.9,3:12163.0,4:12210.3,5:11518.1,6:8348.9},
+  qBell:{2:1988.9,3:1949.1,4:1860.7,5:1827.7,6:1817.7},
+  qWater:{2:15273.7,3:6633.5,4:6726.0,5:6558.4,6:6204.1},
+  qCherry:{2:4610.7,3:4605.9,4:4516.7,5:4479.2,6:4351.3},
+  qChance:{2:32157.6,3:31072.7,4:20459.1,5:20776.7,6:20555.8},
+  cherryAoharu:{2:.301,3:.309,4:.363,5:.375,6:.402},
+  chanceAoharu:{2:.500,3:.535,4:.578,5:.590,6:.602}
+};
+const D={
+  games:0,netCoins:"",machineMemo:"",shortMemo:"",setting1Confirmed:false,
+  afterStMiss:false,afterReset:false,bonusGapG:0,czMisses:0,czGapG:0,currentPt:0,
+  bonus:0,aoharu:0,dreamCollection:0,
+  bellRaw:0,cherryRaw:0,waterRaw:0,chanceRaw:0,replayRaw:0,
+  cherryNormal:0,cherryAoharu:0,chanceNormal:0,chanceAoharu:0,
+  use_roleAoharu:false,
+  pt300pre:0,pt300hit:0,pt400trial:0,pt400hit:0,pt500pre:0,pt500hit:0,
+  saku:0,qBell:0,qWater:0,qCherry:0,qChance:0,
+  use_bonus:true,use_aoharu:true,use_pt400:true,use_quest:false,use_saku:false,
+  screens:{default:0,odd:0,even:0,weak:0,strong:0,s3:0,s4:0,s5:0,s6:0},
+  hard:{m456:0,m555:0,m821:0,m666:0,push:0},
+  nagi:{white:0,blue:0,green:0,red:0,silver:0,gold:0},
+  eyecatch:{blueTitleSea:0,redTitle:0},
+  events:[],snapshots:[]
+};
+let st=load();
+
+const screenDefs=[
+  ["default","咲太","デフォルト"],
+  ["odd","のどか","奇数設定示唆"],
+  ["even","朋絵","偶数設定示唆"],
+  ["weak","理央","高設定示唆（弱）"],
+  ["strong","麻衣","高設定示唆（強）"],
+  ["s3","かえで（吉）","設定3以上"],
+  ["s4","翔子（良）","設定4以上"],
+  ["s5","バニー麻衣（優）","設定5以上"],
+  ["s6","全員集合（極）","設定6"]
+];
+const hardDefs=[
+  ["m456","456枚OVER","設定4以上"],
+  ["m555","555枚OVER","設定5以上"],
+  ["m821","821枚OVER","設定5以上"],
+  ["m666","666枚OVER","設定6"],
+  ["push","ハルルナPUSH","設定4以上"]
+];
+const eyecatchDefs=[
+  ["blueTitleSea","青タイトル＋海中","示唆内容調査中・設定推定には未使用"],
+  ["redTitle","赤タイトル","100pt CZ報告あり・正式解析待ち"]
+];
+const nagiDefs=[
+  ["white","白","デフォルト（参考）"],
+  ["blue","青","設定2以上示唆（参考）"],
+  ["green","緑","設定3以上示唆（参考）"],
+  ["red","赤","設定4以上示唆（参考）"],
+  ["silver","銀","設定5以上示唆（参考）"],
+  ["gold","金","設定6示唆（参考）"]
+];
+const rawRoles=[
+  ["replayRaw","リプレイ","全設定共通 1/9.5"],
+  ["bellRaw","ベル","全設定共通 1/5.6"],
+  ["cherryRaw","チェリー","全設定共通 1/66.9"],
+  ["waterRaw","スイカ","全設定共通 1/99.4"],
+  ["chanceRaw","チャンス目","全設定共通 1/199.2"]
+];
+const extras=[
+  ["qBell","咲太クエスト：ベル","設定2 1/1988.9 → 6 1/1817.7"],
+  ["qWater","咲太クエスト：スイカ","設定2 1/15273.7 → 3以上で大幅上昇"],
+  ["qCherry","咲太クエスト：チェリー","設定2 1/4610.7 → 6 1/4351.3"],
+  ["qChance","咲太クエスト：チャンス目","設定2 1/32157.6 → 6 1/20555.8"],
+  ["saku","咲太ポイントMAX","設定2 1/12387.9 → 6 1/8348.9"]
+];
+
+function load(){
+  try{
+    const x=JSON.parse(localStorage.getItem("aobuta_pro_v2")||"{}");
+    return {
+      ...structuredClone(D),...x,
+      screens:{...D.screens,...(x.screens||{})},
+      hard:{...D.hard,...(x.hard||{})},
+      nagi:{...D.nagi,...(x.nagi||{})},
+      eyecatch:{...D.eyecatch,...(x.eyecatch||{})},
+      events:Array.isArray(x.events)?x.events:[],
+      snapshots:Array.isArray(x.snapshots)?x.snapshots:[]
+    };
+  }catch(e){ return structuredClone(D); }
+}
+function save(){
+  localStorage.setItem("aobuta_pro_v2",JSON.stringify(st));
+  const b=document.getElementById("saveState");
+  b.textContent="保存済み ✓"; setTimeout(()=>b.textContent="自動保存中",700);
+}
+const n=v=>Math.max(0,Math.floor(Number(v)||0));
+function pLL(k,g,den){
+  if(g<=0)return 0;
+  const lam=g/den;
+  return k*Math.log(lam)-lam;
+}
+function bLL(x,tr,p){
+  if(tr<=0)return 0;
+  x=Math.min(x,tr);
+  return x*Math.log(p)+(tr-x)*Math.log(1-p);
+}
+function constraint(){
+  let min=2,exact=null,reasons=[];
+  if(st.screens.s3>0){min=Math.max(min,3);reasons.push("かえで")}
+  if(st.screens.s4>0){min=Math.max(min,4);reasons.push("翔子")}
+  if(st.screens.s5>0){min=Math.max(min,5);reasons.push("バニー麻衣")}
+  if(st.screens.s6>0){exact=6;reasons.push("全員集合")}
+  if(st.hard.m456>0){min=Math.max(min,4);reasons.push("456枚")}
+  if(st.hard.m555>0){min=Math.max(min,5);reasons.push("555枚")}
+  if(st.hard.m821>0){min=Math.max(min,5);reasons.push("821枚")}
+  if(st.hard.m666>0){exact=6;reasons.push("666枚")}
+  if(st.hard.push>0){min=Math.max(min,4);reasons.push("ハルルナPUSH")}
+  if(exact===6)min=6;
+  return {min,exact,reasons};
+}
+function calc(){
+  const g=n(st.games), c=constraint();
+  const allowed=SETTINGS.filter(s=>c.exact?s===c.exact:s>=c.min);
+  const ll={};
+  SETTINGS.forEach(s=>ll[s]=allowed.includes(s)?0:-Infinity);
+  SETTINGS.forEach(s=>{
+    if(!allowed.includes(s))return;
+    if(st.use_bonus&&g>0)ll[s]+=pLL(n(st.bonus),g,RATE.bonus[s]);
+    if(st.use_aoharu&&g>0&&!st.use_roleAoharu)ll[s]+=pLL(n(st.aoharu),g,RATE.aoharu[s]);
+    if(st.use_roleAoharu){
+      if(n(st.cherryNormal)>0)ll[s]+=bLL(n(st.cherryAoharu),n(st.cherryNormal),RATE.cherryAoharu[s]);
+      if(n(st.chanceNormal)>0)ll[s]+=bLL(n(st.chanceAoharu),n(st.chanceNormal),RATE.chanceAoharu[s]);
+    }
+    if(st.use_pt400&&n(st.pt400trial)>0)ll[s]+=bLL(n(st.pt400hit),n(st.pt400trial),RATE.pt400[s]);
+    if(st.use_saku&&g>0)ll[s]+=pLL(n(st.saku),g,RATE.saku[s]);
+    if(st.use_quest&&g>0){
+      ll[s]+=pLL(n(st.qBell),g,RATE.qBell[s]);
+      ll[s]+=pLL(n(st.qWater),g,RATE.qWater[s]);
+      ll[s]+=pLL(n(st.qCherry),g,RATE.qCherry[s]);
+      ll[s]+=pLL(n(st.qChance),g,RATE.qChance[s]);
+    }
+  });
+  const mx=Math.max(...allowed.map(s=>ll[s]));
+  let w={},sum=0;
+  SETTINGS.forEach(s=>{w[s]=allowed.includes(s)?Math.exp(ll[s]-mx):0;sum+=w[s]});
+  SETTINGS.forEach(s=>w[s]=sum?w[s]/sum:0);
+  return {w,c};
+}
+function ratio(a,b){
+  if(!b)return "—";
+  return (100*a/b).toFixed(1)+"%";
+}
+function rateText(g,k){
+  if(!g||!k)return "—";
+  return "実戦値 1/"+(g/k).toFixed(1);
+}
+function addEvent(type,meta=""){
+  st.events.unshift({id:Date.now()+Math.random(),g:n(st.games),type,meta,t:new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})});
+  if(st.events.length>200)st.events=st.events.slice(0,200);
+}
+function removeLatestEvent(type){
+  const i=st.events.findIndex(e=>e.type===type);
+  if(i>=0)st.events.splice(i,1);
+}
+function cueCard(grp,k,a,b){
+  return `<div class="cue">
+    <span class="badgecount" id="${grp}_${k}">0</span>
+    <b>${a}</b><span>${b}</span>
+    <div class="cueActions">
+      <button class="btn" data-cuegroup="${grp}" data-cue="${k}" data-cuedelta="-1">−</button>
+      <button class="btn secondary" data-cuegroup="${grp}" data-cue="${k}" data-cuedelta="1">＋</button>
+    </div>
+  </div>`;
+}
+function buildButtons(){
+  document.getElementById("screenCues").innerHTML=screenDefs.map(([k,a,b])=>cueCard("screens",k,a,b)).join("");
+  document.getElementById("hardCues").innerHTML=hardDefs.map(([k,a,b])=>cueCard("hard",k,a,b)).join("");
+  document.getElementById("nagiCues").innerHTML=nagiDefs.map(([k,a,b])=>cueCard("nagi",k,a,b)).join("");
+  document.getElementById("eyecatchCues").innerHTML=eyecatchDefs.map(([k,a,b])=>cueCard("eyecatch",k,a,b)).join("");
+  document.getElementById("rawRoleCounters").innerHTML=rawRoles.map(([k,a,b])=>
+    `<div class="counter">
+      <button class="btn pm" data-count="${k}" data-d="-1">−</button>
+      <div><div class="name">${a}</div><div class="num" id="${k}V">0</div><div class="hint" id="${k}R">${b}</div></div>
+      <button class="btn secondary pm" data-count="${k}" data-d="1">＋</button>
+    </div>`).join("");
+  document.getElementById("extraCounters").innerHTML=extras.map(([k,a,b])=>
+    `<div class="counter">
+      <button class="btn pm" data-count="${k}" data-d="-1">−</button>
+      <div><div class="name">${a}</div><div class="num" id="${k}V">0</div><div class="hint">${b}</div></div>
+      <button class="btn secondary pm" data-count="${k}" data-d="1">＋</button>
+    </div>`).join("");
+}
+function render(){
+  const g=n(st.games);
+  ["games","netCoins","machineMemo","shortMemo","bonusGapG","czMisses","czGapG","currentPt"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(document.activeElement!==el)el.value=st[id]??"";
+  });
+  ["bonus","aoharu","dreamCollection","replayRaw","bellRaw","cherryRaw","waterRaw","chanceRaw","qBell","qWater","qCherry","qChance","saku"].forEach(k=>{
+    const el=document.getElementById(k+"V"); if(el)el.textContent=n(st[k]);
+  });
+  document.getElementById("bonusR").textContent=rateText(g,n(st.bonus));
+  document.getElementById("aoharuR").textContent=rateText(g,n(st.aoharu));
+  document.getElementById("dreamCollectionR").textContent=
+    n(st.aoharu)>0 ? `選択率 ${(100*n(st.dreamCollection)/n(st.aoharu)).toFixed(1)}% ｜ 公開基本値 32.1%` : "選択率 — ｜ 公開基本値 32.1%";
+
+  document.getElementById("afterStMiss").checked=!!st.afterStMiss;
+  document.getElementById("afterReset").checked=!!st.afterReset;
+
+  const shortCeiling=!!st.afterStMiss || !!st.afterReset;
+  const bonusCeil=shortCeiling?699:899;
+  const bonusRemain=Math.max(0,bonusCeil-n(st.bonusGapG));
+  document.getElementById("bonusCeilingStatus").textContent=n(st.bonusGapG)>=bonusCeil ? "天井域＋α" : `残り目安 ${bonusRemain}G＋α`;
+  document.getElementById("bonusCeilingSub").textContent=shortCeiling ? `699G＋αに短縮中${st.afterStMiss?"（ST駆け抜け）":""}${st.afterReset?"（リセット）":""}` : "通常：最大899G＋α";
+
+  const miss=Math.min(6,n(st.czMisses));
+  if(miss>=6){
+    document.getElementById("czMissStatus").textContent="次回CZ 成功濃厚";
+    document.getElementById("czMissSub").textContent="CZ6連続失敗済み → 7回目CZ";
+  }else if(miss===5){
+    document.getElementById("czMissStatus").textContent="5スルー";
+    document.getElementById("czMissSub").textContent="次回も失敗すると、その次（7回目）が成功濃厚";
+  }else{
+    document.getElementById("czMissStatus").textContent=`${miss}スルー`;
+    document.getElementById("czMissSub").textContent=`6連続失敗まであと ${6-miss}回`;
+  }
+
+  const czRemain=Math.max(0,560-n(st.czGapG));
+  document.getElementById("czGameRemain").textContent=n(st.czGapG)>=560 ? "560G到達域＋α" : `残り目安 ${czRemain}G＋α`;
+  const ptNow=Math.min(1000,n(st.currentPt));
+  document.getElementById("ptRemain").textContent=ptNow>=1000 ? "1000pt到達" : `残り ${1000-ptNow}pt`;
+
+  let flags=[];
+  if(shortCeiling)flags.push("699G天井");
+  if(miss>=6)flags.push("次回CZ成功濃厚");
+  else if(miss===5)flags.push("CZ5スルー");
+  if(n(st.czGapG)>=450)flags.push("CZ間天井接近");
+  if(ptNow>=800)flags.push("pt天井接近");
+  document.getElementById("hyenaSummary").textContent=flags.length?flags.join(" ＋ "):"特別条件なし";
+  const rawDen={replayRaw:9.5,bellRaw:5.6,cherryRaw:66.9,waterRaw:99.4,chanceRaw:199.2};
+  Object.entries(rawDen).forEach(([k,d])=>{
+    const el=document.getElementById(k+"R");
+    if(el){
+      el.textContent=n(st[k])&&g ? `実戦 1/${(g/n(st[k])).toFixed(1)} ｜ 公開値 1/${d}` : `公開値 1/${d}`;
+    }
+  });
+  document.getElementById("cherryAoharuTxt").textContent=`${n(st.cherryAoharu)} / ${n(st.cherryNormal)} (${ratio(n(st.cherryAoharu),n(st.cherryNormal))})`;
+  document.getElementById("chanceAoharuTxt").textContent=`${n(st.chanceAoharu)} / ${n(st.chanceNormal)} (${ratio(n(st.chanceAoharu),n(st.chanceNormal))})`;
+  document.getElementById("pt300Txt").textContent=`${n(st.pt300hit)} / ${n(st.pt300pre)} (${ratio(n(st.pt300hit),n(st.pt300pre))})`;
+  document.getElementById("pt400Txt").textContent=`${n(st.pt400hit)} / ${n(st.pt400trial)} (${ratio(n(st.pt400hit),n(st.pt400trial))})`;
+  document.getElementById("pt500Txt").textContent=`${n(st.pt500hit)} / ${n(st.pt500pre)} (${ratio(n(st.pt500hit),n(st.pt500pre))})`;
+  ["use_bonus","use_aoharu","use_roleAoharu","use_pt400","use_quest","use_saku"].forEach(k=>document.getElementById(k).checked=!!st[k]);
+
+  [["screens",screenDefs],["hard",hardDefs],["nagi",nagiDefs],["eyecatch",eyecatchDefs]].forEach(([grp,defs])=>{
+    defs.forEach(([k])=>{
+      const ct=n(st[grp][k]), badge=document.getElementById(`${grp}_${k}`);
+      badge.textContent=ct;
+      badge.closest(".cue").classList.toggle("on",ct>0);
+    });
+  });
+
+  const {w,c}=calc();
+  document.getElementById("setting1Confirmed").checked=!!st.setting1Confirmed;
+  const barsEl=document.getElementById("bars");
+  const box=document.getElementById("constraint");
+  if(st.setting1Confirmed){
+    barsEl.innerHTML=`
+      <div class="barrow"><div class="barlabel">設定1</div>
+      <div class="track"><div class="fill" style="width:100%"></div></div>
+      <div class="pct">確認</div></div>`;
+    document.getElementById("best").textContent="設定 1";
+    document.getElementById("confidence").textContent="デモ画面確認";
+    box.style.display="block";
+    if(c.min>2){
+      box.className="notice warn";
+      box.textContent="入力内容が矛盾しています：設定1確認と、設定"+c.min+"以上の示唆が同時に記録されています。示唆履歴を確認してください。";
+    }else{
+      box.className="notice good";
+      box.textContent="デモ画面中の下パネル消灯確認を優先し、設定1として表示しています。";
+    }
+  }else{
+    barsEl.innerHTML=SETTINGS.map(s=>`
+      <div class="barrow"><div class="barlabel">設定${s}</div>
+      <div class="track"><div class="fill" style="width:${(w[s]*100).toFixed(2)}%"></div></div>
+      <div class="pct">${(w[s]*100).toFixed(1)}%</div></div>`).join("");
+    const any=g>0||c.min>2||n(st.pt400trial)>0;
+    const best=SETTINGS.reduce((a,b)=>w[b]>w[a]?b:a,2);
+    document.getElementById("best").textContent=any?`設定 ${best}`:"設定 —";
+    let conf="データ未入力";
+    const active=[
+      st.use_bonus&&g>0,
+      st.use_aoharu&&g>0&&!st.use_roleAoharu,
+      st.use_roleAoharu&&(n(st.cherryNormal)>0||n(st.chanceNormal)>0),
+      st.use_pt400&&n(st.pt400trial)>0,
+      st.use_quest&&g>0,
+      st.use_saku&&g>0
+    ].filter(Boolean).length;
+    if(c.exact)conf="設定6確定系";
+    else if(c.min>2)conf=`設定${c.min}以上`;
+    else if(g>=5000&&active>=2)conf="データ多め";
+    else if(g>=2500)conf="データ中";
+    else if(g>0)conf="データ少なめ";
+    document.getElementById("confidence").textContent=conf;
+    box.className="notice good";
+    if(c.min>2){
+      box.style.display="block";
+      box.textContent=(c.exact?"設定6確定系":"設定"+c.min+"以上濃厚系")+"を反映中："+c.reasons.join(" / ");
+    }else box.style.display="none";
+  }
+
+  const hardN=document.getElementById("hardCueNotice");
+  if(c.reasons.length){
+    hardN.style.display="block";hardN.textContent="設定条件に反映："+c.reasons.join(" / ");
+  }else hardN.style.display="none";
+
+  renderLog();
+  drawChart();
+}
+function renderLog(){
+  const el=document.getElementById("eventLog");
+  if(!st.events.length){el.innerHTML='<div class="info" style="padding:12px">履歴はまだありません。</div>';return}
+  el.innerHTML=st.events.map(e=>`
+    <div class="logitem"><div class="g">${e.g}G</div>
+    <div><div class="type">${esc(e.type)}</div><div class="meta">${esc(e.meta||"")} ${esc(e.t||"")}</div></div>
+    <button class="x" data-del="${e.id}">×</button></div>`).join("");
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function snapshot(){
+  if(st.setting1Confirmed){
+    alert("設定1確認中は、設定2〜6の数値推定グラフには記録しません。");
+    return;
+  }
+  const {w}=calc();
+  st.snapshots.push({g:n(st.games),net:st.netCoins===""?null:Number(st.netCoins),p:SETTINGS.map(s=>+(w[s]*100).toFixed(2)),t:Date.now()});
+  if(st.snapshots.length>80)st.snapshots=st.snapshots.slice(-80);
+  save();render();
+}
+function drawChart(){
+  const c=document.getElementById("chart"),ctx=c.getContext("2d"),W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="#ece8f2";ctx.lineWidth=1;
+  ctx.font="11px sans-serif";ctx.fillStyle="#817a89";
+  [0,25,50,75,100].forEach(v=>{
+    const y=H-24-(v/100)*(H-44);
+    ctx.beginPath();ctx.moveTo(38,y);ctx.lineTo(W-10,y);ctx.stroke();
+    ctx.fillText(v+"%",5,y+4);
+  });
+  if(st.snapshots.length<1){
+    ctx.fillStyle="#8a8490";ctx.font="13px sans-serif";ctx.fillText("スナップショットを保存すると推移を表示します",70,H/2);
+    return;
+  }
+  const colors=["#8e8a95","#5b8def","#42a66e","#e29a33","#8a55e8"];
+  const maxG=Math.max(...st.snapshots.map(x=>x.g),1);
+  SETTINGS.forEach((s,si)=>{
+    ctx.strokeStyle=colors[si];ctx.lineWidth=2;ctx.beginPath();
+    st.snapshots.forEach((x,i)=>{
+      const xx=38+(x.g/maxG)*(W-52);
+      const yy=H-24-(x.p[si]/100)*(H-44);
+      if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+    });
+    ctx.stroke();
+  });
+  let lx=45;
+  SETTINGS.forEach((s,si)=>{
+    ctx.fillStyle=colors[si];ctx.fillRect(lx,8,10,3);
+    ctx.fillStyle="#5f5965";ctx.fillText("設定"+s,lx+14,12);lx+=67;
+  });
+  ctx.fillStyle="#817a89";ctx.fillText("0G",35,H-7);ctx.fillText(maxG+"G",W-55,H-7);
+}
+function download(name,type,text){
+  const blob=new Blob([text],{type}),a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},300);
+}
+function csv(){
+  const rows=[["G","種別","メモ","時刻"],...st.events.slice().reverse().map(e=>[e.g,e.type,e.meta||"",e.t||""])];
+  return "\ufeff"+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+}
+
+buildButtons();
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-count]");
+  if(b){
+    const k=b.dataset.count,d=Number(b.dataset.d);
+    st[k]=n(st[k]+d);
+    if(k==="pt300hit"&&st.pt300hit>st.pt300pre)st.pt300pre=st.pt300hit;
+    if(k==="pt400hit"&&st.pt400hit>st.pt400trial)st.pt400trial=st.pt400hit;
+    if(k==="pt500hit"&&st.pt500hit>st.pt500pre)st.pt500pre=st.pt500hit;
+    if(k==="cherryAoharu"&&st.cherryAoharu>st.cherryNormal)st.cherryNormal=st.cherryAoharu;
+    if(k==="chanceAoharu"&&st.chanceAoharu>st.chanceNormal)st.chanceNormal=st.chanceAoharu;
+    if(k==="dreamCollection"&&st.dreamCollection>st.aoharu)st.aoharu=st.dreamCollection;
+    if(d>0&&b.dataset.logtype)addEvent(b.dataset.logtype);
+    if(d<0&&b.dataset.logtype)removeLatestEvent(b.dataset.logtype);
+    save();render();return;
+  }
+  const cue=e.target.closest("[data-cuegroup]");
+  if(cue){
+    const grp=cue.dataset.cuegroup,k=cue.dataset.cue,d=Number(cue.dataset.cuedelta||1);
+    const before=n(st[grp][k]);
+    st[grp][k]=n(before+d);
+    const defs=grp==="screens"?screenDefs:grp==="hard"?hardDefs:grp==="nagi"?nagiDefs:eyecatchDefs;
+    const item=defs.find(x=>x[0]===k);
+    const label=item?item[1]:"示唆";
+    if(d>0)addEvent(label,item?item[2]:"");
+    if(d<0&&before>0)removeLatestEvent(label);
+    save();render();return;
+  }
+  const del=e.target.closest("[data-del]");
+  if(del){st.events=st.events.filter(x=>String(x.id)!==String(del.dataset.del));save();render()}
+});
+
+["games","netCoins","machineMemo","shortMemo","bonusGapG","czMisses","czGapG","currentPt"].forEach(id=>{
+  document.getElementById(id).addEventListener("input",e=>{
+    const numericIds=["games","bonusGapG","czMisses","czGapG","currentPt"];
+    st[id]=numericIds.includes(id)?n(e.target.value):e.target.value;
+    if(id==="czMisses")st[id]=Math.min(6,st[id]);
+    if(id==="currentPt")st[id]=Math.min(1000,st[id]);
+    save();render();
+  });
+});
+["use_bonus","use_aoharu","use_roleAoharu","use_pt400","use_quest","use_saku"].forEach(id=>{
+  document.getElementById(id).addEventListener("change",e=>{st[id]=e.target.checked;save();render()});
+});
+document.getElementById("setting1Confirmed").addEventListener("change",e=>{
+  st.setting1Confirmed=e.target.checked;save();render();
+});
+["afterStMiss","afterReset"].forEach(id=>{
+  document.getElementById(id).addEventListener("change",e=>{st[id]=e.target.checked;save();render()});
+});
+document.getElementById("addNote").onclick=()=>{
+  const x=prompt("このゲーム数で残すメモ");
+  if(x!==null&&x.trim()){addEvent("メモ",x.trim());save();render()}
+};
+document.getElementById("clearLog").onclick=()=>{
+  if(confirm("イベント履歴だけを消去しますか？")){st.events=[];save();render()}
+};
+document.getElementById("snapshot").onclick=snapshot;
+document.getElementById("snapshotBottom").onclick=snapshot;
+document.getElementById("clearSnapshots").onclick=()=>{
+  if(confirm("推定推移の履歴だけを消去しますか？")){st.snapshots=[];save();render()}
+};
+document.getElementById("exportJson").onclick=()=>download(
+  `aobuta_backup_${new Date().toISOString().slice(0,10)}.json`,
+  "application/json;charset=utf-8",JSON.stringify(st,null,2)
+);
+document.getElementById("exportCsv").onclick=()=>download(
+  `aobuta_history_${new Date().toISOString().slice(0,10)}.csv`,
+  "text/csv;charset=utf-8",csv()
+);
+document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
+document.getElementById("importFile").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const x=JSON.parse(r.result);
+      st={...structuredClone(D),...x,
+        screens:{...D.screens,...(x.screens||{})},
+        hard:{...D.hard,...(x.hard||{})},
+        nagi:{...D.nagi,...(x.nagi||{})},
+        eyecatch:{...D.eyecatch,...(x.eyecatch||{})},
+        events:Array.isArray(x.events)?x.events:[],
+        snapshots:Array.isArray(x.snapshots)?x.snapshots:[]
+      };
+      save();render();alert("バックアップを読み込みました。");
+    }catch(err){alert("読み込みに失敗しました。JSONファイルを確認してください。")}
+  };
+  r.readAsText(f);
+  e.target.value="";
+};
+document.getElementById("resetAll").onclick=()=>{
+  if(confirm("実戦データをすべてリセットしますか？")){
+    st=structuredClone(D);save();render();
+  }
+};
+document.getElementById("saveState").onclick=save;
+
+render();
+</script>
+
+<script>
+let deferredPwaPrompt = null;
+
+function isStandaloneMode(){
+  return window.matchMedia('(display-mode: standalone)').matches ||
+         window.navigator.standalone === true;
+}
+
+function updatePwaUi(){
+  const btn = document.getElementById('installApp');
+  const status = document.getElementById('pwaStatus');
+  if(!btn || !status) return;
+
+  if(isStandaloneMode()){
+    btn.style.display = 'none';
+    status.textContent = 'ホーム画面アプリとして起動中です。';
+  }else if(deferredPwaPrompt){
+    btn.style.display = 'inline-block';
+    status.textContent = 'インストールできます。';
+  }else{
+    btn.style.display = 'none';
+    status.textContent = 'Chromeのメニューから「ホーム画面に追加」も利用できます。';
+  }
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPwaPrompt = e;
+  updatePwaUi();
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPwaPrompt = null;
+  updatePwaUi();
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('installApp');
+  if(btn){
+    btn.addEventListener('click', async () => {
+      if(!deferredPwaPrompt) return;
+      deferredPwaPrompt.prompt();
+      try { await deferredPwaPrompt.userChoice; } catch(e) {}
+      deferredPwaPrompt = null;
+      updatePwaUi();
+    });
+  }
+  updatePwaUi();
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      reg.update().catch(()=>{});
+    }).catch(()=>{});
+  }
+});
+</script>
+
+</body>
+</html>
