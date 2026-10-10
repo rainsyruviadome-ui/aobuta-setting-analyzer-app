@@ -16,5 +16,12 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ]
+  "icons": [
+  {
+    "src": "./icon.jpg",
+    "sizes": "1024x1024",
+    "type": "image/jpeg",
+    "purpose": "any maskable"
+  }
+]
 }
