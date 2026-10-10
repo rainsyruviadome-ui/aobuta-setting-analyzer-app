@@ -1,9 +1,9 @@
-const CACHE_NAME = 'aobuta-setting-pro-v7-pwa-1';
+const CACHE_NAME = 'aobuta-setting-pro-v7-pwa-2';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './icon.svg'
+  './icon.jpg'
 ];
 
 self.addEventListener('install', event => {
