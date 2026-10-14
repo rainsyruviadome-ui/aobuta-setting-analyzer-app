@@ -257,52 +257,24 @@ a{color:#5c45d4}
 </section>
 
 <section class="card">
-  <h2>小役実測・小役からの当選</h2>
-  <div class="info">
-    公開解析では通常時の小役成立確率は全設定共通です。ここでは<strong>自分の実戦値を確認するためだけ</strong>にカウントします。
-    設定判別で重要なのは、通常状態のチェリー・チャンス目からアオハルCHANCEへ当選した割合です。
-  </div>
-
-  <div id="rawRoleCounters" style="margin-top:8px"></div>
-
-  <h3>通常状態のみ：アオハルCHANCE当選率</h3>
-  <div class="grid2">
-    <div class="statbox">
-      <div class="label">チェリー → アオハル</div>
-      <div class="value" id="cherryAoharuTxt">0 / 0</div>
-      <div class="compare">設定2 30.1% / 3 30.9% / 4 36.3% / 5 37.5% / 6 40.2%</div>
-    </div>
-    <div class="statbox">
-      <div class="label">チャンス目 → アオハル</div>
-      <div class="value" id="chanceAoharuTxt">0 / 0</div>
-      <div class="compare">設定2 50.0% / 3 53.5% / 4 57.8% / 5 59.0% / 6 60.2%</div>
-    </div>
-  </div>
-
-  <h3>チェリー</h3>
-  <div class="row pointBtns">
-    <button class="btn" data-count="cherryNormal" data-d="-1">通常中 −</button>
-    <button class="btn secondary" data-count="cherryNormal" data-d="1">通常中 ＋</button>
-    <button class="btn" data-count="cherryAoharu" data-d="-1">当選 −</button>
-    <button class="btn good" data-count="cherryAoharu" data-d="1">当選 ＋</button>
-  </div>
-
-  <h3>チャンス目</h3>
-  <div class="row pointBtns">
-    <button class="btn" data-count="chanceNormal" data-d="-1">通常中 −</button>
-    <button class="btn secondary" data-count="chanceNormal" data-d="1">通常中 ＋</button>
-    <button class="btn" data-count="chanceAoharu" data-d="-1">当選 −</button>
-    <button class="btn good" data-count="chanceAoharu" data-d="1">当選 ＋</button>
-  </div>
-
-  <div class="toggle">
-    <input id="use_roleAoharu" type="checkbox">
-    <label for="use_roleAoharu">チェリー/チャンス目→アオハル当選率を設定推定に使う</label>
-  </div>
-  <div class="notice warn" style="margin-top:8px">
-    高確・リラックス中は全設定共通（スイカ30.1%・チェリー50.0%・チャンス目85.2%）なので、上の母数には<strong>通常状態と判断できる試行だけ</strong>を入れてください。
-    この項目をONにした場合、二重計上を避けるため「アオハルCHANCE全体出現率」は推定計算から自動的に外します。
-  </div>
+<h2>小役の公開解析値</h2>
+<div class="info">小役カウントは行いません。以下は公開解析値の参考表示です。</div>
+<h3>小役成立確率（全設定共通）</h3>
+<table><tbody>
+<tr><td>リプレイ</td><td>1/9.5</td><td>ベル</td><td>1/5.6</td></tr>
+<tr><td>チェリー</td><td>1/66.9</td><td>スイカ</td><td>1/99.4</td></tr>
+<tr><td>チャンス目合算</td><td>1/199.2</td><td>レア小役合算（観測目含む）</td><td>1/31.5</td></tr>
+</tbody></table>
+<h3>通常状態：アオハルCHANCE当選率</h3>
+<table>
+<tr><th>設定</th><th>チェリー</th><th>チャンス目</th></tr>
+<tr><td>2</td><td>30.1%</td><td>50.0%</td></tr>
+<tr><td>3</td><td>30.9%</td><td>53.5%</td></tr>
+<tr><td>4</td><td>36.3%</td><td>57.8%</td></tr>
+<tr><td>5</td><td>37.5%</td><td>59.0%</td></tr>
+<tr><td>6</td><td>40.2%</td><td>60.2%</td></tr>
+</table>
+<div class="info">高確・リラックス中は全設定共通：スイカ30.1%・チェリー50.0%・チャンス目85.2%。参考表示のみで設定推定には使用しません。</div>
 </section>
 
 <section class="card">
@@ -477,9 +449,6 @@ const D={
   games:0,netCoins:"",machineMemo:"",shortMemo:"",setting1Confirmed:false,
   afterStMiss:false,afterReset:false,bonusGapG:0,czMisses:0,czGapG:0,currentPt:0,
   bonus:0,aoharu:0,dreamCollection:0,
-  bellRaw:0,cherryRaw:0,waterRaw:0,chanceRaw:0,replayRaw:0,
-  cherryNormal:0,cherryAoharu:0,chanceNormal:0,chanceAoharu:0,
-  use_roleAoharu:false,
   pt300pre:0,pt300hit:0,pt400trial:0,pt400hit:0,pt500pre:0,pt500hit:0,
   saku:0,qBell:0,qWater:0,qCherry:0,qChance:0,
   use_bonus:true,use_aoharu:true,use_pt400:true,use_quest:false,use_saku:false,
@@ -520,13 +489,6 @@ const nagiDefs=[
   ["red","赤","設定4以上示唆（参考）"],
   ["silver","銀","設定5以上示唆（参考）"],
   ["gold","金","設定6示唆（参考）"]
-];
-const rawRoles=[
-  ["replayRaw","リプレイ","全設定共通 1/9.5"],
-  ["bellRaw","ベル","全設定共通 1/5.6"],
-  ["cherryRaw","チェリー","全設定共通 1/66.9"],
-  ["waterRaw","スイカ","全設定共通 1/99.4"],
-  ["chanceRaw","チャンス目","全設定共通 1/199.2"]
 ];
 const extras=[
   ["qBell","咲太クエスト：ベル","設定2 1/1988.9 → 6 1/1817.7"],
@@ -588,11 +550,7 @@ function calc(){
   SETTINGS.forEach(s=>{
     if(!allowed.includes(s))return;
     if(st.use_bonus&&g>0)ll[s]+=pLL(n(st.bonus),g,RATE.bonus[s]);
-    if(st.use_aoharu&&g>0&&!st.use_roleAoharu)ll[s]+=pLL(n(st.aoharu),g,RATE.aoharu[s]);
-    if(st.use_roleAoharu){
-      if(n(st.cherryNormal)>0)ll[s]+=bLL(n(st.cherryAoharu),n(st.cherryNormal),RATE.cherryAoharu[s]);
-      if(n(st.chanceNormal)>0)ll[s]+=bLL(n(st.chanceAoharu),n(st.chanceNormal),RATE.chanceAoharu[s]);
-    }
+    if(st.use_aoharu&&g>0)ll[s]+=pLL(n(st.aoharu),g,RATE.aoharu[s]);
     if(st.use_pt400&&n(st.pt400trial)>0)ll[s]+=bLL(n(st.pt400hit),n(st.pt400trial),RATE.pt400[s]);
     if(st.use_saku&&g>0)ll[s]+=pLL(n(st.saku),g,RATE.saku[s]);
     if(st.use_quest&&g>0){
@@ -639,12 +597,6 @@ function buildButtons(){
   document.getElementById("hardCues").innerHTML=hardDefs.map(([k,a,b])=>cueCard("hard",k,a,b)).join("");
   document.getElementById("nagiCues").innerHTML=nagiDefs.map(([k,a,b])=>cueCard("nagi",k,a,b)).join("");
   document.getElementById("eyecatchCues").innerHTML=eyecatchDefs.map(([k,a,b])=>cueCard("eyecatch",k,a,b)).join("");
-  document.getElementById("rawRoleCounters").innerHTML=rawRoles.map(([k,a,b])=>
-    `<div class="counter">
-      <button class="btn pm" data-count="${k}" data-d="-1">−</button>
-      <div><div class="name">${a}</div><div class="num" id="${k}V">0</div><div class="hint" id="${k}R">${b}</div></div>
-      <button class="btn secondary pm" data-count="${k}" data-d="1">＋</button>
-    </div>`).join("");
   document.getElementById("extraCounters").innerHTML=extras.map(([k,a,b])=>
     `<div class="counter">
       <button class="btn pm" data-count="${k}" data-d="-1">−</button>
@@ -658,7 +610,7 @@ function render(){
     const el=document.getElementById(id);
     if(document.activeElement!==el)el.value=st[id]??"";
   });
-  ["bonus","aoharu","dreamCollection","replayRaw","bellRaw","cherryRaw","waterRaw","chanceRaw","qBell","qWater","qCherry","qChance","saku"].forEach(k=>{
+  ["bonus","aoharu","dreamCollection","qBell","qWater","qCherry","qChance","saku"].forEach(k=>{
     const el=document.getElementById(k+"V"); if(el)el.textContent=n(st[k]);
   });
   document.getElementById("bonusR").textContent=rateText(g,n(st.bonus));
@@ -699,19 +651,10 @@ function render(){
   if(n(st.czGapG)>=450)flags.push("CZ間天井接近");
   if(ptNow>=800)flags.push("pt天井接近");
   document.getElementById("hyenaSummary").textContent=flags.length?flags.join(" ＋ "):"特別条件なし";
-  const rawDen={replayRaw:9.5,bellRaw:5.6,cherryRaw:66.9,waterRaw:99.4,chanceRaw:199.2};
-  Object.entries(rawDen).forEach(([k,d])=>{
-    const el=document.getElementById(k+"R");
-    if(el){
-      el.textContent=n(st[k])&&g ? `実戦 1/${(g/n(st[k])).toFixed(1)} ｜ 公開値 1/${d}` : `公開値 1/${d}`;
-    }
-  });
-  document.getElementById("cherryAoharuTxt").textContent=`${n(st.cherryAoharu)} / ${n(st.cherryNormal)} (${ratio(n(st.cherryAoharu),n(st.cherryNormal))})`;
-  document.getElementById("chanceAoharuTxt").textContent=`${n(st.chanceAoharu)} / ${n(st.chanceNormal)} (${ratio(n(st.chanceAoharu),n(st.chanceNormal))})`;
   document.getElementById("pt300Txt").textContent=`${n(st.pt300hit)} / ${n(st.pt300pre)} (${ratio(n(st.pt300hit),n(st.pt300pre))})`;
   document.getElementById("pt400Txt").textContent=`${n(st.pt400hit)} / ${n(st.pt400trial)} (${ratio(n(st.pt400hit),n(st.pt400trial))})`;
   document.getElementById("pt500Txt").textContent=`${n(st.pt500hit)} / ${n(st.pt500pre)} (${ratio(n(st.pt500hit),n(st.pt500pre))})`;
-  ["use_bonus","use_aoharu","use_roleAoharu","use_pt400","use_quest","use_saku"].forEach(k=>document.getElementById(k).checked=!!st[k]);
+  ["use_bonus","use_aoharu","use_pt400","use_quest","use_saku"].forEach(k=>document.getElementById(k).checked=!!st[k]);
 
   [["screens",screenDefs],["hard",hardDefs],["nagi",nagiDefs],["eyecatch",eyecatchDefs]].forEach(([grp,defs])=>{
     defs.forEach(([k])=>{
@@ -751,8 +694,7 @@ function render(){
     let conf="データ未入力";
     const active=[
       st.use_bonus&&g>0,
-      st.use_aoharu&&g>0&&!st.use_roleAoharu,
-      st.use_roleAoharu&&(n(st.cherryNormal)>0||n(st.chanceNormal)>0),
+      st.use_aoharu&&g>0,
       st.use_pt400&&n(st.pt400trial)>0,
       st.use_quest&&g>0,
       st.use_saku&&g>0
@@ -850,8 +792,6 @@ document.addEventListener("click",e=>{
     if(k==="pt300hit"&&st.pt300hit>st.pt300pre)st.pt300pre=st.pt300hit;
     if(k==="pt400hit"&&st.pt400hit>st.pt400trial)st.pt400trial=st.pt400hit;
     if(k==="pt500hit"&&st.pt500hit>st.pt500pre)st.pt500pre=st.pt500hit;
-    if(k==="cherryAoharu"&&st.cherryAoharu>st.cherryNormal)st.cherryNormal=st.cherryAoharu;
-    if(k==="chanceAoharu"&&st.chanceAoharu>st.chanceNormal)st.chanceNormal=st.chanceAoharu;
     if(k==="dreamCollection"&&st.dreamCollection>st.aoharu)st.aoharu=st.dreamCollection;
     if(d>0&&b.dataset.logtype)addEvent(b.dataset.logtype);
     if(d<0&&b.dataset.logtype)removeLatestEvent(b.dataset.logtype);
@@ -882,7 +822,7 @@ document.addEventListener("click",e=>{
     save();render();
   });
 });
-["use_bonus","use_aoharu","use_roleAoharu","use_pt400","use_quest","use_saku"].forEach(id=>{
+["use_bonus","use_aoharu","use_pt400","use_quest","use_saku"].forEach(id=>{
   document.getElementById(id).addEventListener("change",e=>{st[id]=e.target.checked;save();render()});
 });
 document.getElementById("setting1Confirmed").addEventListener("change",e=>{

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aobuta-setting-pro-v7-pwa-3';
+const CACHE_NAME = 'aobuta-setting-pro-v8-public';
 const APP_SHELL = [
   './',
   './index.html',
