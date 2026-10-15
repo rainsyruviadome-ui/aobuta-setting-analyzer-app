@@ -1,10 +1,11 @@
-const CACHE_NAME = 'aobuta-setting-pro-v8-public';
+const CACHE_NAME = 'aobuta-setting-pro-v9-role-count-icon';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './icon.jpg'
 ];
 
 self.addEventListener('install', event => {

@@ -274,6 +274,35 @@ a{color:#5c45d4}
 <tr><td>5</td><td>37.5%</td><td>59.0%</td></tr>
 <tr><td>6</td><td>40.2%</td><td>60.2%</td></tr>
 </table>
+<h3>アオハルCHANCE当選率：実戦カウント（通常状態のみ）</h3>
+<div class="info">役が成立して非当選なら「非当選＋」、その役から当選なら「当選＋」を押してください。各1タップで成立回数も集計します。</div>
+<div class="grid2">
+  <div class="statbox">
+    <div class="label">チェリー → アオハルCHANCE</div>
+    <div class="value" id="roleCherryRate">—</div>
+    <div class="compare" id="roleCherryCount">当選 0 / 成立 0</div>
+    <div class="row pointBtns">
+      <button class="btn secondary small" data-role="roleCherryMissV2" data-d="1">非当選＋</button>
+      <button class="btn good small" data-role="roleCherryHitV2" data-d="1">当選＋</button>
+      <button class="btn small" data-role="roleCherryMissV2" data-d="-1">非当選−</button>
+      <button class="btn small" data-role="roleCherryHitV2" data-d="-1">当選−</button>
+    </div>
+  </div>
+  <div class="statbox">
+    <div class="label">チャンス目 → アオハルCHANCE</div>
+    <div class="value" id="roleChanceRate">—</div>
+    <div class="compare" id="roleChanceCount">当選 0 / 成立 0</div>
+    <div class="row pointBtns">
+      <button class="btn secondary small" data-role="roleChanceMissV2" data-d="1">非当選＋</button>
+      <button class="btn good small" data-role="roleChanceHitV2" data-d="1">当選＋</button>
+      <button class="btn small" data-role="roleChanceMissV2" data-d="-1">非当選−</button>
+      <button class="btn small" data-role="roleChanceHitV2" data-d="-1">当選−</button>
+    </div>
+  </div>
+</div>
+<div class="toggle"><input type="checkbox" id="use_roleAoharuV2"><label for="use_roleAoharuV2">小役からのアオハルCHANCE当選率を設定推定に使う</label></div>
+<div class="info" id="roleEstimateMode"></div>
+<div class="notice warn" style="margin-top:8px">内部状態が通常と判断できる試行だけ入力してください。状態不明・高確・リラックス中、契機を特定できない当選は含めません。小役別の当選率を使うときは、重複計上防止のためアオハルCHANCE全体出現率を推定から外します。</div>
 <div class="info">高確・リラックス中は全設定共通：スイカ30.1%・チェリー50.0%・チャンス目85.2%。参考表示のみで設定推定には使用しません。</div>
 </section>
 
@@ -449,6 +478,7 @@ const D={
   games:0,netCoins:"",machineMemo:"",shortMemo:"",setting1Confirmed:false,
   afterStMiss:false,afterReset:false,bonusGapG:0,czMisses:0,czGapG:0,currentPt:0,
   bonus:0,aoharu:0,dreamCollection:0,
+  roleCherryHitV2:0,roleCherryMissV2:0,roleChanceHitV2:0,roleChanceMissV2:0,use_roleAoharuV2:true,
   pt300pre:0,pt300hit:0,pt400trial:0,pt400hit:0,pt500pre:0,pt500hit:0,
   saku:0,qBell:0,qWater:0,qCherry:0,qChance:0,
   use_bonus:true,use_aoharu:true,use_pt400:true,use_quest:false,use_saku:false,
@@ -544,13 +574,20 @@ function constraint(){
 }
 function calc(){
   const g=n(st.games), c=constraint();
+  const chTrials=n(st.roleCherryHitV2)+n(st.roleCherryMissV2);
+  const caTrials=n(st.roleChanceHitV2)+n(st.roleChanceMissV2);
+  const useRole=!!st.use_roleAoharuV2&&(chTrials+caTrials>0);
   const allowed=SETTINGS.filter(s=>c.exact?s===c.exact:s>=c.min);
   const ll={};
   SETTINGS.forEach(s=>ll[s]=allowed.includes(s)?0:-Infinity);
   SETTINGS.forEach(s=>{
     if(!allowed.includes(s))return;
     if(st.use_bonus&&g>0)ll[s]+=pLL(n(st.bonus),g,RATE.bonus[s]);
-    if(st.use_aoharu&&g>0)ll[s]+=pLL(n(st.aoharu),g,RATE.aoharu[s]);
+    if(st.use_aoharu&&g>0&&!useRole)ll[s]+=pLL(n(st.aoharu),g,RATE.aoharu[s]);
+    if(useRole){
+      if(chTrials)ll[s]+=bLL(n(st.roleCherryHitV2),chTrials,RATE.cherryAoharu[s]);
+      if(caTrials)ll[s]+=bLL(n(st.roleChanceHitV2),caTrials,RATE.chanceAoharu[s]);
+    }
     if(st.use_pt400&&n(st.pt400trial)>0)ll[s]+=bLL(n(st.pt400hit),n(st.pt400trial),RATE.pt400[s]);
     if(st.use_saku&&g>0)ll[s]+=pLL(n(st.saku),g,RATE.saku[s]);
     if(st.use_quest&&g>0){
@@ -651,6 +688,17 @@ function render(){
   if(n(st.czGapG)>=450)flags.push("CZ間天井接近");
   if(ptNow>=800)flags.push("pt天井接近");
   document.getElementById("hyenaSummary").textContent=flags.length?flags.join(" ＋ "):"特別条件なし";
+  const cherryTrials=n(st.roleCherryHitV2)+n(st.roleCherryMissV2);
+  const chanceTrials=n(st.roleChanceHitV2)+n(st.roleChanceMissV2);
+  document.getElementById("roleCherryRate").textContent=ratio(n(st.roleCherryHitV2),cherryTrials);
+  document.getElementById("roleChanceRate").textContent=ratio(n(st.roleChanceHitV2),chanceTrials);
+  document.getElementById("roleCherryCount").textContent=`当選 ${n(st.roleCherryHitV2)} / 成立 ${cherryTrials}`;
+  document.getElementById("roleChanceCount").textContent=`当選 ${n(st.roleChanceHitV2)} / 成立 ${chanceTrials}`;
+  document.getElementById("use_roleAoharuV2").checked=!!st.use_roleAoharuV2;
+  const useRole=!!st.use_roleAoharuV2&&(cherryTrials+chanceTrials>0);
+  document.getElementById("roleEstimateMode").textContent=useRole
+    ? "役別の当選率を設定推定に使用中（アオハル全体出現率は除外）"
+    : "役別当選率は設定推定に未使用（全体出現率は従来の設定に従います）";
   document.getElementById("pt300Txt").textContent=`${n(st.pt300hit)} / ${n(st.pt300pre)} (${ratio(n(st.pt300hit),n(st.pt300pre))})`;
   document.getElementById("pt400Txt").textContent=`${n(st.pt400hit)} / ${n(st.pt400trial)} (${ratio(n(st.pt400hit),n(st.pt400trial))})`;
   document.getElementById("pt500Txt").textContent=`${n(st.pt500hit)} / ${n(st.pt500pre)} (${ratio(n(st.pt500hit),n(st.pt500pre))})`;
@@ -688,13 +736,14 @@ function render(){
       <div class="barrow"><div class="barlabel">設定${s}</div>
       <div class="track"><div class="fill" style="width:${(w[s]*100).toFixed(2)}%"></div></div>
       <div class="pct">${(w[s]*100).toFixed(1)}%</div></div>`).join("");
-    const any=g>0||c.min>2||n(st.pt400trial)>0;
+    const any=g>0||c.min>2||n(st.pt400trial)>0||useRole;
     const best=SETTINGS.reduce((a,b)=>w[b]>w[a]?b:a,2);
     document.getElementById("best").textContent=any?`設定 ${best}`:"設定 —";
     let conf="データ未入力";
     const active=[
       st.use_bonus&&g>0,
-      st.use_aoharu&&g>0,
+      st.use_aoharu&&g>0&&!useRole,
+      useRole,
       st.use_pt400&&n(st.pt400trial)>0,
       st.use_quest&&g>0,
       st.use_saku&&g>0
@@ -785,6 +834,13 @@ function csv(){
 buildButtons();
 
 document.addEventListener("click",e=>{
+  const r=e.target.closest("[data-role]");
+  if(r){
+    const k=r.dataset.role, d=Number(r.dataset.d);
+    if(["roleCherryHitV2","roleCherryMissV2","roleChanceHitV2","roleChanceMissV2"].includes(k)){
+      st[k]=n(st[k]+d);save();render();return;
+    }
+  }
   const b=e.target.closest("[data-count]");
   if(b){
     const k=b.dataset.count,d=Number(b.dataset.d);
@@ -824,6 +880,9 @@ document.addEventListener("click",e=>{
 });
 ["use_bonus","use_aoharu","use_pt400","use_quest","use_saku"].forEach(id=>{
   document.getElementById(id).addEventListener("change",e=>{st[id]=e.target.checked;save();render()});
+});
+document.getElementById("use_roleAoharuV2").addEventListener("change",e=>{
+  st.use_roleAoharuV2=e.target.checked;save();render();
 });
 document.getElementById("setting1Confirmed").addEventListener("change",e=>{
   st.setting1Confirmed=e.target.checked;save();render();
